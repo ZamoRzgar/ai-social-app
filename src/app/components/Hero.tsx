@@ -2,11 +2,11 @@
 import React from 'react';
 
 const Hero = () => {
-    const scrollToLearnMore = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
         e.preventDefault();
-        const learnMoreSection = document.getElementById('learn-more');
-        if (learnMoreSection) {
-            learnMoreSection.scrollIntoView({ behavior: 'smooth' });
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
         }
     };
 
@@ -30,6 +30,7 @@ const Hero = () => {
                 <div className="flex gap-4 justify-center">
                     <a
                         href="#features"
+                        onClick={(e) => scrollToSection(e, 'features')}
                         className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full 
                         transition-all duration-300 ease-in-out transform hover:-translate-y-1 
                         hover:shadow-lg hover:shadow-blue-500/25 font-medium"
@@ -39,7 +40,7 @@ const Hero = () => {
 
                     <a
                         href="#learn-more"
-                        onClick={scrollToLearnMore}
+                        onClick={(e) => scrollToSection(e, 'learn-more')}
                         className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-full 
                         transition-all duration-300 backdrop-blur-sm border border-white/10
                         hover:border-white/20 ease-in-out transform hover:-translate-y-1"
