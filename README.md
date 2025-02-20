@@ -26,7 +26,7 @@ An AI-powered web application that includes an AI chatbot, trends finder, and po
 ### To Get Started:
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/ai-social-media-assistant.git
+   git clone https://github.com/ZamoRzgar/ai-social-media-assistant.git
    cd ai-social-media-assistant
 
    
