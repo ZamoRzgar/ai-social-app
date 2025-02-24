@@ -29,14 +29,7 @@ const Header = () => {
                         >
                             Contact
                         </a>
-                        <a
-                            href="/signup"
-                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full 
-                                     transition-all duration-300 text-sm font-medium
-                                     hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5"
-                        >
-                            Get Started
-                        </a>
+
                     </nav>
                 </div>
             </div>
