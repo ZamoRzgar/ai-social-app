@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         try {
             // Connect to MongoDB - await the connection to ensure it's ready
-            const mongoose = await dbConnect();
+
 
             let botResponse;
 

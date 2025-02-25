@@ -3,7 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import clientPromise from '../../../lib/mongodb-adapter';
 import dbConnect from '../../../lib/mongodb';
-
+//req
 export default NextAuth({
   providers: [
     CredentialsProvider({
@@ -14,7 +14,7 @@ export default NextAuth({
         username: { label: 'Username', type: 'text', placeholder: 'username' },
         password: { label: 'Password', type: 'password' }
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         // Add your own authentication logic here
         try {
           // Example: Check credentials against database
