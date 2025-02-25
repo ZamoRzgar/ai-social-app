@@ -1,8 +1,6 @@
 "use client";
 import React, { useState } from 'react';
 
-
-
 const ContactSection = () => {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const [status, setStatus] = useState('');
@@ -34,7 +32,7 @@ const ContactSection = () => {
                 setStatus('Failed to send message. Please try again.');
                 setStatusType('error');
             }
-        } catch (error) {
+        } catch {
             setStatus('Failed to send message. Please try again.');
             setStatusType('error');
         } finally {

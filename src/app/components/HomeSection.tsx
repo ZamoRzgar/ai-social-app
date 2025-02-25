@@ -6,7 +6,7 @@ const FluidAnimation = () => {
     const particles = useRef<{ x: number; y: number; vx: number; vy: number; size: number; }[]>([]);
     const mouse = useRef({ x: 0, y: 0 });
     const count = 50;
-    //deltaTime
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -14,7 +14,6 @@ const FluidAnimation = () => {
         if (!ctx) return;
 
         let animationFrameId: number;
-        let lastTime = 0;
 
         const resizeCanvas = () => {
             if (!canvas) return;
@@ -43,10 +42,7 @@ const FluidAnimation = () => {
             }));
         };
 
-        const animate = (timestamp: number) => {
-
-            lastTime = timestamp;
-
+        const animate = () => {
             if (!ctx || !canvas) return;
 
             // Clear the canvas with slight transparency

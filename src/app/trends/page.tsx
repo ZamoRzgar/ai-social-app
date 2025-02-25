@@ -26,7 +26,7 @@ const TrendsPage = () => {
                 } else {
                     setError(data.error || 'Failed to load trends');
                 }
-            } catch (error) {
+            } catch {
                 setError('Error fetching trends');
             } finally {
                 setLoading(false);
