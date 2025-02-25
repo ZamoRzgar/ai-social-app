@@ -12,38 +12,57 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         try {
-            // Connect to MongoDB
-            await dbConnect();
+            // Connect to MongoDB - await the connection to ensure it's ready
+            const mongoose = await dbConnect();
 
-            // Call OpenRouter API
-            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`, // Use OpenRouter API key
-                },
-                body: JSON.stringify({
-                    model: 'gpt-3.5-turbo', // Use a valid model ID
-                    messages: [
-                        { role: 'user', content: message }
-                    ],
-                    max_tokens: 150,
-                    temperature: 0.7,
-                }),
-            });
+            let botResponse;
 
-            const data = await response.json();
-            console.log('Response data:', data); // Log the response data
+            try {
+                // Call OpenRouter API
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [
+                            { role: 'user', content: message }
+                        ],
+                        max_tokens: 150,
+                        temperature: 0.7,
+                    }),
+                });
 
-            const botResponse = data.choices && data.choices[0]?.message?.content
-                ? data.choices[0].message.content.trim()
-                : 'No response';
+                if (!response.ok) {
+                    throw new Error(`API responded with status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                botResponse = data.choices && data.choices[0]?.message?.content
+                    ? data.choices[0].message.content.trim()
+                    : 'No response';
+
+            } catch (apiError) {
+                console.error('Error calling AI API:', apiError);
+                botResponse = 'Sorry, I encountered an error processing your request.';
+            }
 
             // Save the chat to the database
-            await Chat.create({
-                userMessage: message,
-                botMessage: botResponse,
-            });
+            try {
+                const chatEntry = await Chat.create({
+                    userMessage: message,
+                    botMessage: botResponse,
+                });
+
+                console.log('Chat saved to database with ID:', chatEntry._id);
+            } catch (dbError) {
+                console.error('Error saving to database:', dbError);
+                // Continue with the response even if DB save fails
+            }
 
             // Respond with the AI's reply
             return res.status(200).json({ response: botResponse });
@@ -51,7 +70,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             console.error('Error processing chat:', error);
             return res.status(500).json({ error: 'Failed to process the message' });
         }
+    } else if (req.method === 'GET') {
+        // Add GET endpoint to retrieve recent chats
+        try {
+            await dbConnect();
+            const chats = await Chat.find().sort({ createdAt: -1 }).limit(10);
+            return res.status(200).json({ chats });
+        } catch (error) {
+            console.error('Error fetching chats:', error);
+            return res.status(500).json({ error: 'Failed to fetch chats' });
+        }
     } else {
-        return res.status(405).json({ error: 'Only POST requests are allowed' });
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 }
