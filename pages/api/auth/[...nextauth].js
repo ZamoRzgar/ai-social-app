@@ -3,32 +3,30 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import clientPromise from '../../../lib/mongodb-adapter';
 import dbConnect from '../../../lib/mongodb';
-//req
+import bcrypt from 'bcryptjs';
+
 export default NextAuth({
   providers: [
     CredentialsProvider({
-      // The name to display on the sign in form (e.g. 'Sign in with...')
       name: 'Credentials',
-      // The credentials is used to generate a suitable form on the sign in page.
       credentials: {
         username: { label: 'Username', type: 'text', placeholder: 'username' },
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        // Add your own authentication logic here
         try {
-          // Example: Check credentials against database
           await dbConnect();
-          
-          // This is a simplified example - in production, replace with real user lookup
-          // and proper password hashing (e.g., bcrypt)
-          if (credentials.username === 'test' && credentials.password === 'password') {
-            return {
-              id: '1',
-              name: 'Test User',
-              email: 'test@example.com',
-            };
+          const client = await clientPromise;
+          const db = client.db();
+          const usersCollection = db.collection('users');
+
+          // Find user in the database
+          const user = await usersCollection.findOne({ username: credentials.username });
+
+          if (user && bcrypt.compareSync(credentials.password, user.password)) {
+            return { id: user._id, name: user.username, email: user.email };
           }
+
           return null;
         } catch (error) {
           console.error('Authentication error:', error);
@@ -44,7 +42,6 @@ export default NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
-      // Initial sign in
       if (user) {
         token.id = user.id;
         token.role = user.role || 'user';
@@ -52,7 +49,6 @@ export default NextAuth({
       return token;
     },
     async session({ session, token }) {
-      // Send properties to the client
       if (token) {
         session.user.id = token.id;
         session.user.role = token.role;
@@ -62,8 +58,6 @@ export default NextAuth({
   },
   pages: {
     signIn: '/auth/signin',
-    // error: '/auth/error', // Error code passed in query string as ?error=
-    // signOut: '/auth/signout',
   },
   secret: process.env.NEXTAUTH_SECRET, // Ensure this is set in your environment variables
 });
