@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         try {
             // Connect to MongoDB - await the connection to ensure it's ready
-
+            await dbConnect();
 
             let botResponse;
 
@@ -40,7 +40,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }
 
                 const data = await response.json();
-                console.log('Response data:', data);
+                console.log('Response data:', JSON.stringify(data, null, 2));
+
+                // Check the actual structure 
+                if (data.choices && data.choices.length > 0) {
+                    console.log('Message object:', JSON.stringify(data.choices[0].message, null, 2));
+                }
 
                 botResponse = data.choices && data.choices[0]?.message?.content
                     ? data.choices[0].message.content.trim()
